@@ -56,3 +56,68 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         }
     });
 });
+
+// Product carousel with navigation buttons
+const productScroll = document.querySelector('.product-scroll');
+if (productScroll) {
+    const navContainer = document.createElement('div');
+    navContainer.className = 'carousel-nav';
+    
+    const prevBtn = document.createElement('button');
+    const nextBtn = document.createElement('button');
+    
+    prevBtn.className = 'carousel-btn prev';
+    nextBtn.className = 'carousel-btn next';
+    prevBtn.innerHTML = '&larr;';
+    nextBtn.innerHTML = '&rarr;';
+    
+    navContainer.appendChild(prevBtn);
+    navContainer.appendChild(nextBtn);
+    productScroll.parentNode.appendChild(navContainer);
+    
+    const scrollAmount = 300;
+    const scrollDuration = 500;
+    
+    const smoothScroll = (element, direction) => {
+        const start = element.scrollLeft;
+        let end;
+        
+        if (direction === 'next') {
+            end = start + scrollAmount;
+            if (end >= element.scrollWidth - element.clientWidth) {
+                end = 0; // Loop to start
+            }
+        } else {
+            end = start - scrollAmount;
+            if (end < 0) {
+                end = element.scrollWidth - element.clientWidth; // Loop to end
+            }
+        }
+        
+        const change = end - start;
+        const startTime = performance.now();
+        
+        const animateScroll = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / scrollDuration, 1);
+            const ease = progress < 0.5 
+                ? 2 * progress * progress 
+                : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+            
+            element.scrollLeft = start + change * ease;
+            
+            if (progress < 1) {
+                requestAnimationFrame(animateScroll);
+            }
+        };
+        
+        requestAnimationFrame(animateScroll);
+    };
+    
+    prevBtn.addEventListener('click', () => smoothScroll(productScroll, 'prev'));
+    nextBtn.addEventListener('click', () => smoothScroll(productScroll, 'next'));
+    
+    // Always show both buttons
+    prevBtn.style.display = 'block';
+    nextBtn.style.display = 'block';
+}
